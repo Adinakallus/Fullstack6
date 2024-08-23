@@ -1,6 +1,7 @@
 // src/App.jsx
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import Properties from './Components/Properties';
 
 function App() {
   const [users, setUsers] = useState([]);
@@ -69,6 +70,7 @@ function App() {
           </li>
         ))}
       </ul>
+      <Properties />
     </div>
   );
 }
