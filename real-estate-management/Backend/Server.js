@@ -1,6 +1,15 @@
 const express = require('express');
 const app = express();
 const db = require('./db');  // MySQL connection file
+const path = require('path');
+
+// Serve static files from the "uploads" directory
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+// Example: Your server might look like this
+app.listen(3000, () => {
+  console.log('Server started on http://localhost:3000');
+});
 
 app.use(express.json());  // To parse JSON bodies
 
