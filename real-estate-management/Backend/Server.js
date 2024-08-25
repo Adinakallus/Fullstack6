@@ -90,21 +90,27 @@ app.post('/properties', (req, res) => {
             res.status(201).json({ id: result.insertId });
         }
     });
+    
+
+    
 });
 
 //Get all properties
-app.get('/properties', (req, res) => {
-    const query = 'SELECT * FROM properties';
+// app.get('/properties', (req, res) => {
+//     const query = 'SELECT * FROM properties';
     
-    db.query(query, (err, results) => {
-        if (err) {
-            console.error('Error fetching properties:', err);
-            res.status(500).json({ error: 'Failed to fetch properties' });
-        } else {
-            res.json(results);
-        }
-    });
-});
+//     db.query(query, (err, results) => {
+//         if (err) {
+//             console.error('Error fetching properties:', err);
+//             res.status(500).json({ error: 'Failed to fetch properties' });
+//         } else {
+//             res.json(results);
+//         }
+//     });
+
+  
+
+//});
 
 //Get single property based on id
 app.get('/properties/:id', (req, res) => {
@@ -157,6 +163,44 @@ app.delete('/properties/:id', (req, res) => {
 
 //#region FULL PROPERTY
 
+// Get all properties with their features, images, videos, and audios
+
+app.get('/properties', (req, res) => {
+
+    const query = `
+        SELECT 
+            p.*, 
+            JSON_ARRAYAGG(JSON_OBJECT('id', pf.id, 'name', pf.feature_name, 'value', pf.feature_value)) AS features,
+            JSON_ARRAYAGG(JSON_OBJECT('id', pi.id, 'path', pi.image_path)) AS images,
+            JSON_ARRAYAGG(JSON_OBJECT('id', pv.id, 'path', pv.video_path)) AS videos,
+            JSON_ARRAYAGG(JSON_OBJECT('id', pa.id, 'path', pa.audio_path)) AS audios
+        FROM 
+            properties p
+        LEFT JOIN 
+            property_features pf ON p.id = pf.property_id
+        LEFT JOIN 
+            property_images pi ON p.id = pi.property_id
+        LEFT JOIN 
+            property_videos pv ON p.id = pv.property_id
+        LEFT JOIN 
+            property_audios pa ON p.id = pa.property_id
+        GROUP BY 
+            p.id
+    `;
+    db.query(query, (err, results) => {
+        console.log(results)
+
+        if (err) {
+            console.log(results)
+            console.error('Error fetching propertiessssssss:', err);
+            res.status(500).json({ error: 'Failed to fetch propertiesssssss' });
+        } else {
+            res.json(results);
+        }
+    });
+
+});
+
 //Add full property with everything included
 app.post('/properties/full', (req, res) => {
     const { name, location, price, description, manager_id, features, images, videos, audios } = req.body;
@@ -171,11 +215,16 @@ app.post('/properties/full', (req, res) => {
 
         const propertyId = result.insertId;
 
-        // Insert features, images, videos, audios if they exist
-        const insertRelatedData = (tableName, data, fieldName) => {
+        // Function to insert related data
+        const insertRelatedData = (tableName, data, columns) => {
             if (!data || data.length === 0) return Promise.resolve();
-            const values = data.map((item) => [propertyId, item[fieldName]]);
-            const query = `INSERT INTO ${tableName} (property_id, ${fieldName}) VALUES ?`;
+            // Generate values and column list dynamically
+            const values = data.map((item) => {
+                // Create array of values based on column list
+                const valueArray = columns.map((col) => item[col]);
+                return [propertyId, ...valueArray];
+            });
+            const query = `INSERT INTO ${tableName} (property_id, ${columns.join(', ')}) VALUES ?`;
             return new Promise((resolve, reject) => {
                 db.query(query, [values], (err) => {
                     if (err) reject(err);
@@ -184,21 +233,23 @@ app.post('/properties/full', (req, res) => {
             });
         };
 
+        // Insert features, images, videos, audios if they exist
         Promise.all([
-            insertRelatedData('property_features', features, 'feature_name, feature_value'),
-            insertRelatedData('property_images', images, 'image_path'),
-            insertRelatedData('property_videos', videos, 'video_path'),
-            insertRelatedData('property_audios', audios, 'audio_path')
+            insertRelatedData('property_features', features, ['feature_name', 'feature_value']),
+            insertRelatedData('property_images', images, ['image_path']),
+            insertRelatedData('property_videos', videos, ['video_path']),
+            insertRelatedData('property_audios', audios, ['audio_path'])
         ])
-            .then(() => {
-                res.status(201).json({ message: 'Property and related data created successfully', id: propertyId });
-            })
-            .catch((err) => {
-                console.error('Error inserting related data:', err);
-                res.status(500).json({ error: 'Failed to insert related data' });
-            });
+        .then(() => {
+            res.status(201).json({ message: 'Property and related data created successfully', id: propertyId });
+        })
+        .catch((err) => {
+            console.error('Error inserting related data:', err);
+            res.status(500).json({ error: 'Failed to insert related data' });
+        });
     });
 });
+
 
 //Read a Single Full Property with All Details
 app.get('/properties/full/:id', (req, res) => {
@@ -239,37 +290,8 @@ app.get('/properties/full/:id', (req, res) => {
     });
 });
 
-// Get all properties with their features, images, videos, and audios
-app.get('/properties/full', (req, res) => {
-    const query = `
-        SELECT 
-            p.*, 
-            JSON_ARRAYAGG(JSON_OBJECT('id', pf.id, 'name', pf.feature_name, 'value', pf.feature_value)) AS features,
-            JSON_ARRAYAGG(JSON_OBJECT('id', pi.id, 'path', pi.image_path)) AS images,
-            JSON_ARRAYAGG(JSON_OBJECT('id', pv.id, 'path', pv.video_path)) AS videos,
-            JSON_ARRAYAGG(JSON_OBJECT('id', pa.id, 'path', pa.audio_path)) AS audios
-        FROM 
-            properties p
-        LEFT JOIN 
-            property_features pf ON p.id = pf.property_id
-        LEFT JOIN 
-            property_images pi ON p.id = pi.property_id
-        LEFT JOIN 
-            property_videos pv ON p.id = pv.property_id
-        LEFT JOIN 
-            property_audios pa ON p.id = pa.property_id
-        GROUP BY 
-            p.id
-    `;
-    db.query(query, (err, results) => {
-        if (err) {
-            console.error('Error fetching properties:', err);
-            res.status(500).json({ error: 'Failed to fetch properties' });
-        } else {
-            res.json(results);
-        }
-    });
-});
+
+
 //Update a Full Property with All Details
 app.put('/properties/full/:id', (req, res) => {
     const { id } = req.params;
