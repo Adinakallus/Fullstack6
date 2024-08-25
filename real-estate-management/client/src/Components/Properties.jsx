@@ -1,4 +1,3 @@
-// src/Properties.js
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
@@ -39,7 +38,11 @@ const Properties = () => {
                         <h3>Images:</h3>
                         <div>
                             {property.images && property.images.map((image, index) => (
-                                <img key={index} src={`/uploads/images/${image.path}`} alt={`Property ${property.id}`} />
+                                <img 
+                                    key={index} 
+                                    src={`http://localhost:3000/${image.path}`} 
+                                    alt={`Property ${property.id}`} 
+                                />
                             ))}
                         </div>
                     </div>
