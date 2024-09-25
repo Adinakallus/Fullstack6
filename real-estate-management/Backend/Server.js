@@ -5,6 +5,13 @@ const path = require('path');
 const bcrypt = require('bcrypt');
 const cors = require('cors');
 const bodyParser = require('body-parser');
+const userRoutes = require('./routes/userRoutes');
+const propertyRoutes = require('./routes/propertiesRoutes');
+const featureRoutes = require('./routes/featureRoutes');
+const imageRoutes= require('./routes/imageRoutes');
+const videoRoutes=require('./routes/videoRoutes');
+const authRouter=require('./routes/authRouter');
+
 
 //Serve static files from the "uploads" directory
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
@@ -16,6 +23,14 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(express.json());  // To parse JSON bodies
 
+app.use(userRoutes);
+app.use(propertyRoutes);
+app.use(featureRoutes);
+app.use(imageRoutes);
+app.use(videoRoutes);
+app.use('/api/auth', authRouter);
+
+/*
 //#region USER
 // Create a new user
 app.post('/users', async (req, res) => {
@@ -544,7 +559,7 @@ app.delete('/properties/:propertyId/audios/:audioId', (req, res) => {
 //#region MESSAGES
 //#endregion
 
-
+*/
 // Start the server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
