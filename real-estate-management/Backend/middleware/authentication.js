@@ -1,5 +1,8 @@
 const jwt = require('jsonwebtoken');
 const dotenv = require('dotenv');
+const db = require('../db');  // MySQL connection file
+const mysql = require('mysql2/promise');
+
 dotenv.config();
 
 // Middleware to verify the JWT token
@@ -20,22 +23,68 @@ const authenticateToken = (req, res, next) => {
 };
 
 // middlewares/authorizeRole.js
+// const authorizeRole = (...allowedRoles) => {
+//     return (req, res, next) => {
+//         // Check if user is authenticated
+//         if (!req.user) {
+//             return res.status(401).json({ message: "Unauthorized" });
+//         }
+
+//         // Check if user's role is allowed
+//         if (!allowedRoles.includes(req.user.role)) {
+//             console.log("req:", req);
+            
+//             return res.status(403).json({ message: "Forbidden: Access is denied" });
+//         }
+
+//         // If user role is allowed, proceed to next middleware or route handler
+//         next();
+//     };
+// };
 const authorizeRole = (...allowedRoles) => {
-    return (req, res, next) => {
-        // Check if user is authenticated
-        if (!req.user) {
-            return res.status(401).json({ message: "Unauthorized" });
-        }
+    return async (req, res, next) => {
+        try {
+            console.log("id:", req.user.id);
+            
+            // Check if user is authenticated (if no user ID in the request body, reject the request)
+            if (!req.user.id) {
+                return res.status(401).json({ message: "Unauthorized: No user ID" });
+            }
 
-        // Check if user's role is allowed
-        if (!allowedRoles.includes(req.user.role)) {
-            return res.status(403).json({ message: "Forbidden: Access is denied" });
-        }
+            // Fetch user role from the database using the user ID
+            const [rows] = await db.query('SELECT role FROM users WHERE id = ?', [req.user.id]);
+           
 
-        // If user role is allowed, proceed to next middleware or route handler
-        next();
+            console.log("user",user);
+            
+
+            // If no user is found with that ID, return unauthorized
+            if (rows.length === 0) {
+                return res.status(401).json({ message: "Unauthorized: User not found" });
+            }
+
+            const userRole = rows[0].role_id;
+            console.log("user role:", userRole);
+            
+
+            // Check if user's role is allowed
+            if (!allowedRoles.includes(userRole)) {
+                return res.status(403).json({ message: "Forbidden: Access is denied" });
+            }
+
+            // Attach user role to request (optional, if you need it later in the process)
+            req.user = { id: req.user.id, role: userRole };
+
+            // If user role is allowed, proceed to next middleware or route handler
+            next();
+        } catch (error) {
+            console.error('Error authorizing role:', error);
+            return res.status(500).json({ message: "Internal server error" });
+        }
     };
 };
+
+
 
 module.exports = { 
     authorizeRole,
