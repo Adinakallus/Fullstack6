@@ -5,6 +5,13 @@ const path = require('path');
 const bcrypt = require('bcrypt');
 const cors = require('cors');
 const bodyParser = require('body-parser');
+const userRoutes = require('./routes/userRoutes');
+const propertyRoutes = require('./routes/propertiesRoutes');
+const featureRoutes = require('./routes/featureRoutes');
+const imageRoutes= require('./routes/imageRoutes');
+const videoRoutes=require('./routes/videoRoutes');
+const authRouter=require('./routes/authRouter');
+
 
 //Serve static files from the "uploads" directory
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
@@ -16,67 +23,15 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(express.json());  // To parse JSON bodies
 
-//#region USER
-// Create a new user
-app.post('/users', async (req, res) => {
-    const { name, email, password, role_id } = req.body;
-    try {
-        const hashedPassword = await bcrypt.hash(password, 10);
-        db.query('INSERT INTO users (name, email, password, role_id) VALUES (?, ?, ?, ?)',
-            [name, email, hashedPassword, role_id], (err, result) => {
-                if (err) return res.status(500).json({ error: err.message });
-                res.status(201).json({ id: result.insertId, name, email, role_id });
-            });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
+app.use(userRoutes);
+app.use(propertyRoutes);
+app.use(featureRoutes);
+app.use(imageRoutes);
+app.use(videoRoutes);
+app.use('/api/auth', authRouter);
 
-// Get all users
-app.get('/users', (req, res) => {
-    db.query('SELECT id, name, email, role_id FROM users', (err, results) => {
-        if (err) return res.status(500).json({ error: err.message });
-        res.json(results);
-    });
-});
 
-// Get a specific user by ID
-app.get('/users/:id', (req, res) => {
-    const { id } = req.params;
-    db.query('SELECT id, name, email, role_id FROM users WHERE id = ?', [id], (err, results) => {
-        if (err) return res.status(500).json({ error: err.message });
-        if (results.length === 0) return res.status(404).json({ message: 'User not found' });
-        res.json(results[0]);
-    });
-});
-
-// Update a user by ID
-app.put('/users/:id', async (req, res) => {
-    const { id } = req.params;
-    const { name, email, password, role_id } = req.body;
-    try {
-        const hashedPassword = await bcrypt.hash(password, 10);
-        db.query('UPDATE users SET name = ?, email = ?, password = ?, role_id = ? WHERE id = ?',
-            [name, email, hashedPassword, role_id, id], (err) => {
-                if (err) return res.status(500).json({ error: err.message });
-                res.json({ message: 'User updated' });
-            });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
-// Delete a user by ID
-app.delete('/users/:id', (req, res) => {
-    const { id } = req.params;
-    db.query('DELETE FROM users WHERE id = ?', [id], (err) => {
-        if (err) return res.status(500).json({ error: err.message });
-        res.json({ message: 'User deleted' });
-    });
-});
-
-//#endregion
-
+/*
 //#region PROPERTIES
 // Create a property
 app.post('/properties', (req, res) => {
@@ -392,158 +347,12 @@ app.delete('/properties/full/:id', (req, res) => {
 //#endregion
 
 
-//#region PROPERTY_FEATUERS
-
-// Add or update a feature for a property
-app.post('/properties/:id/features', (req, res) => {
-    const { id } = req.params;
-    const { feature_name, feature_value } = req.body;
-    const query = `
-        INSERT INTO property_features (property_id, feature_name, feature_value)
-        VALUES (?, ?, ?)
-        ON DUPLICATE KEY UPDATE feature_value = VALUES(feature_value)
-    `;
-    db.query(query, [id, feature_name, feature_value], (err, result) => {
-        if (err) {
-            console.error('Error adding/updating feature:', err);
-            res.status(500).json({ error: 'Failed to add/update feature' });
-        } else {
-            res.status(201).json({ message: 'Feature added/updated successfully' });
-        }
-    });
-});
-
-// Delete a feature for a property
-app.delete('/properties/:propertyId/features/:featureId', (req, res) => {
-    const { propertyId, featureId } = req.params;
-    const query = 'DELETE FROM property_features WHERE property_id = ? AND id = ?';
-    db.query(query, [propertyId, featureId], (err) => {
-        if (err) {
-            console.error('Error deleting feature:', err);
-            res.status(500).json({ error: 'Failed to delete feature' });
-        } else {
-            res.json({ message: 'Feature deleted successfully' });
-        }
-    });
-});
-
-//#endregion
-
-//#region PROPERTY_IMAGES
-
-// Add or update an image for a property
-app.post('/properties/:id/images', (req, res) => {
-    const { id } = req.params;
-    const { image_path } = req.body;
-    const query = `
-        INSERT INTO property_images (property_id, image_path)
-        VALUES (?, ?)
-        ON DUPLICATE KEY UPDATE image_path = VALUES(image_path)
-    `;
-    db.query(query, [id, image_path], (err, result) => {
-        if (err) {
-            console.error('Error adding/updating image:', err);
-            res.status(500).json({ error: 'Failed to add/update image' });
-        } else {
-            res.status(201).json({ message: 'Image added/updated successfully' });
-        }
-    });
-});
-
-// Delete an image for a property
-app.delete('/properties/:propertyId/images/:imageId', (req, res) => {
-    const { propertyId, imageId } = req.params;
-    const query = 'DELETE FROM property_images WHERE property_id = ? AND id = ?';
-    db.query(query, [propertyId, imageId], (err) => {
-        if (err) {
-            console.error('Error deleting image:', err);
-            res.status(500).json({ error: 'Failed to delete image' });
-        } else {
-            res.json({ message: 'Image deleted successfully' });
-        }
-    });
-});
-
-//#endregion
-
-//#region PROPERTY_VIDEOS
-// Add or update a video for a property
-app.post('/properties/:id/videos', (req, res) => {
-    const { id } = req.params;
-    const { video_path } = req.body;
-    const query = `
-        INSERT INTO property_videos (property_id, video_path)
-        VALUES (?, ?)
-        ON DUPLICATE KEY UPDATE video_path = VALUES(video_path)
-    `;
-    db.query(query, [id, video_path], (err, result) => {
-        if (err) {
-            console.error('Error adding/updating video:', err);
-            res.status(500).json({ error: 'Failed to add/update video' });
-        } else {
-            res.status(201).json({ message: 'Video added/updated successfully' });
-        }
-    });
-});
-
-// Delete a video for a property
-app.delete('/properties/:propertyId/videos/:videoId', (req, res) => {
-    const { propertyId, videoId } = req.params;
-    const query = 'DELETE FROM property_videos WHERE property_id = ? AND id = ?';
-    db.query(query, [propertyId, videoId], (err) => {
-        if (err) {
-            console.error('Error deleting video:', err);
-            res.status(500).json({ error: 'Failed to delete video' });
-        } else {
-            res.json({ message: 'Video deleted successfully' });
-        }
-    });
-});
-
-//#endregion
-
-//#region PROPERTY_AUDIO
-// Add or update an audio for a property
-app.post('/properties/:id/audios', (req, res) => {
-    const { id } = req.params;
-    const { audio_path } = req.body;
-    const query = `
-        INSERT INTO property_audios (property_id, audio_path)
-        VALUES (?, ?)
-        ON DUPLICATE KEY UPDATE audio_path = VALUES(audio_path)
-    `;
-    db.query(query, [id, audio_path], (err, result) => {
-        if (err) {
-            console.error('Error adding/updating audio:', err);
-            res.status(500).json({ error: 'Failed to add/update audio' });
-        } else {
-            res.status(201).json({ message: 'Audio added/updated successfully' });
-        }
-    });
-});
-
-// Delete an audio for a property
-app.delete('/properties/:propertyId/audios/:audioId', (req, res) => {
-    const { propertyId, audioId } = req.params;
-    const query = 'DELETE FROM property_audios WHERE property_id = ? AND id = ?';
-    db.query(query, [propertyId, audioId], (err) => {
-        if (err) {
-            console.error('Error deleting audio:', err);
-            res.status(500).json({ error: 'Failed to delete audio' });
-        } else {
-            res.json({ message: 'Audio deleted successfully' });
-        }
-    });
-});
-
-//#endregion
-
 //#region APPLICATIONS
 //#endregion
 
 //#region MESSAGES
 //#endregion
-
+*/
 
 // Start the server
 const PORT = process.env.PORT || 3000;
