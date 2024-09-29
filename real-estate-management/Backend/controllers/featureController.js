@@ -9,9 +9,12 @@ const addOrUpdateFeature = (req, res) => {
         VALUES (?, ?, ?)
         ON DUPLICATE KEY UPDATE feature_value = VALUES(feature_value)
     `;
-    db.query(query, [id, feature_name, feature_value], (err) => {
+    db.query(query, [id, feature_name, feature_value], (err,result) => {
         if (err) return res.status(500).json({ error: 'Failed to add/update feature' });
-        res.status(201).json({ message: 'Feature added/updated successfully' });
+        const featureId = result.insertId || result.affectedRows > 0 ? result.insertId : null;
+        console.log("feature id:", featureId);
+        
+        res.status(201).json({ message: 'Feature added/updated successfully',feature_id: featureId  });
     });
 };
 
