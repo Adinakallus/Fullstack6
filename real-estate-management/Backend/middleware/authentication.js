@@ -45,7 +45,6 @@ const authorizeRole = (...allowedRoles) => {
     return (req, res, next) => {
         try {
             console.log("id:", req.user.id);
-
             // Check if user is authenticated
             if (!req.user.id) {
                 return res.status(401).json({ message: "Unauthorized: No user ID" });
@@ -62,11 +61,14 @@ const authorizeRole = (...allowedRoles) => {
                 if (results.length === 0) {
                     return res.status(401).json({ message: "Unauthorized: User not found" });
                 }
-                console.log("user:", results[0])
                 const userRole = results[0].role_id;
+                console.log("user:", userRole);
+                console.log("allowedRoles:", allowedRoles);
+                
+
 
                 // Check if user's role is allowed
-                if (!allowedRoles.includes(userRole)) {
+                if (userRole== 1 && !allowedRoles.includes('property_manager')||userRole== 2 && !allowedRoles.includes('property_seeker')) {
                     return res.status(403).json({ message: "Forbidden: Access is denied" });
                 }
 

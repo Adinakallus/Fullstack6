@@ -14,11 +14,11 @@ router.get('/properties/:id', propertyController.getPropertyById);
 router.get('/properties/full', propertyController.getAllFullProperties);
 //get   full property-with all features, images,and videos that belongs to it:
 router.get('/properties/full/:id', propertyController.getFullPropertyById);
-router.post('/properties/create', authenticateToken, authorizeRole('property_manager'), propertyController.createProperty);
-router.put('/properties/update/:id', authenticateToken, authorizeRole('property_manager'), propertyController.updateProperty);
-router.delete('/properties/delete/:id', authenticateToken, authorizeRole('property_manager'), propertyController.deleteProperty);
+router.post('/properties/create', authenticateToken, authorizeRole('Property Manager'), propertyController.createProperty);
+router.put('/properties/update/:id', authenticateToken, authorizeRole('Property Manager'), propertyController.updateProperty);
+router.delete('/properties/delete/:id', authenticateToken, authorizeRole('Property Manager'), propertyController.deleteProperty);
 // Delete a full property along with its associated features, images, videos, and audios
-router.delete('/properties/full/:id', authenticateToken, authorizeRole('property_manager'),propertyController.deleteFullProperty);
+router.delete('/properties/full/:id', authenticateToken, authorizeRole('Property Manager'),propertyController.deleteFullProperty);
 
 
 
