@@ -29,6 +29,8 @@ const getAllProperties = (req, res) => {
 
 // Get a single simple property by ID
 const getPropertyById = (req, res) => {
+    console.log("getPropertyById");
+
     const { id } = req.params;
     const query = 'SELECT * FROM properties WHERE id = ?';
     db.query(query, [id], (err, results) => {
@@ -49,23 +51,32 @@ const getAllFullProperties = (req, res) => {
     
     const query = `
         SELECT 
-            p.*, 
-            JSON_ARRAYAGG(JSON_OBJECT('id', pf.id, 'name', pf.feature_name, 'value', pf.feature_value)) AS features,
-            JSON_ARRAYAGG(JSON_OBJECT('id', pi.id, 'path', pi.image_path)) AS images,
-            JSON_ARRAYAGG(JSON_OBJECT('id', pv.id, 'path', pv.video_path)) AS videos,
-            JSON_ARRAYAGG(JSON_OBJECT('id', pa.id, 'path', pa.audio_path)) AS audios
-        FROM 
-            properties p
-        LEFT JOIN 
-            property_features pf ON p.id = pf.property_id
-        LEFT JOIN 
-            property_images pi ON p.id = pi.property_id
-        LEFT JOIN 
-            property_videos pv ON p.id = pv.property_id
-        LEFT JOIN 
-            property_audios pa ON p.id = pa.property_id
-        GROUP BY 
-            p.id
+    p.*, 
+    (
+        SELECT JSON_ARRAYAGG(JSON_OBJECT('id', pf.id, 'name', pf.feature_name, 'value', pf.feature_value)) 
+        FROM property_features pf 
+        WHERE pf.property_id = p.id
+    ) AS features,
+    (
+        SELECT JSON_ARRAYAGG(JSON_OBJECT('id', pi.id, 'path', pi.image_path)) 
+        FROM property_images pi 
+        WHERE pi.property_id = p.id
+    ) AS images,
+    (
+        SELECT JSON_ARRAYAGG(JSON_OBJECT('id', pv.id, 'path', pv.video_path)) 
+        FROM property_videos pv 
+        WHERE pv.property_id = p.id
+    ) AS videos,
+    (
+        SELECT JSON_ARRAYAGG(JSON_OBJECT('id', pa.id, 'path', pa.audio_path)) 
+        FROM property_audios pa 
+        WHERE pa.property_id = p.id
+    ) AS audios
+FROM 
+    properties p
+GROUP BY 
+    p.id;
+
     `;
     db.query(query, (err, results) => {
         if (err) {
@@ -79,27 +90,36 @@ const getAllFullProperties = (req, res) => {
 
 // Get a single full property by ID with its related features, images, videos, and audios
 const getFullPropertyById = (req, res) => {
+    console.log("getFullPropertyById");
     const { id } = req.params;
     const query = `
         SELECT 
-            p.*, 
-            JSON_ARRAYAGG(JSON_OBJECT('id', pf.id, 'name', pf.feature_name, 'value', pf.feature_value)) AS features,
-            JSON_ARRAYAGG(JSON_OBJECT('id', pi.id, 'path', pi.image_path)) AS images,
-            JSON_ARRAYAGG(JSON_OBJECT('id', pv.id, 'path', pv.video_path)) AS videos,
-            JSON_ARRAYAGG(JSON_OBJECT('id', pa.id, 'path', pa.audio_path)) AS audios
-        FROM 
-            properties p
-        LEFT JOIN 
-            property_features pf ON p.id = pf.property_id
-        LEFT JOIN 
-            property_images pi ON p.id = pi.property_id
-        LEFT JOIN 
-            property_videos pv ON p.id = pv.property_id
-        LEFT JOIN 
-            property_audios pa ON p.id = pa.property_id
-        WHERE p.id = ?
-        GROUP BY p.id
-    `;
+    p.*, 
+    (
+        SELECT JSON_ARRAYAGG(JSON_OBJECT('id', pf.id, 'name', pf.feature_name, 'value', pf.feature_value)) 
+        FROM property_features pf 
+        WHERE pf.property_id = p.id
+    ) AS features,
+    (
+        SELECT JSON_ARRAYAGG(JSON_OBJECT('id', pi.id, 'path', pi.image_path)) 
+        FROM property_images pi 
+        WHERE pi.property_id = p.id
+    ) AS images,
+    (
+        SELECT JSON_ARRAYAGG(JSON_OBJECT('id', pv.id, 'path', pv.video_path)) 
+        FROM property_videos pv 
+        WHERE pv.property_id = p.id
+    ) AS videos,
+    (
+        SELECT JSON_ARRAYAGG(JSON_OBJECT('id', pa.id, 'path', pa.audio_path)) 
+        FROM property_audios pa 
+        WHERE pa.property_id = p.id
+    ) AS audios
+FROM 
+    properties p
+GROUP BY 
+    p.id;
+`;
     db.query(query, [id], (err, results) => {
         if (err) {
             console.error('Error fetching property:', err);
