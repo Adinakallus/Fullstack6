@@ -1,78 +1,33 @@
-// src/App.jsx
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import Properties from './Components/Properties';
+import React from 'react';
+import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+import AddProperty from './Components/PropertyManager/AddProperty';
+import EditProperty from './Components/PropertyManager/EditProperty';
+import DeleteProperty from './Components/PropertyManager/DeleteProperty';
+import ManageInquiries from './Components/PropertyManager/ManageInquiries';
+import Profile from './Components/PropertyManager/Profile';
+import SearchProperties from './Components/PropertySeeker/SearchProperties';
+import PropertyDetails from './Components/PropertySeeker/PropertyDetails';
+import Favorites from './Components/PropertySeeker/Favorites';
+import SearchHistory from './Components/PropertySeeker/SearchHistory';
+import MakeInquiry from './Components/PropertySeeker/MakeInquiry';
 
-function App() {
-  const [users, setUsers] = useState([]);
-  const [user, setUser] = useState({ name: '', email: '', password: '', role_id: 1 });
-
-  useEffect(() => {
-    fetchUsers();
-  }, []);
-
-  const fetchUsers = async () => {
-    try {
-      const response = await axios.get('http://localhost:3000/users');
-      setUsers(response.data);
-    } catch (error) {
-      console.error('Error fetching users:', error);
-    }
-  };
-
-  const createUser = async () => {
-    try {
-      await axios.post('http://localhost:3000/users', user);
-      fetchUsers(); // Refresh the user list
-    } catch (error) {
-      console.error('Error creating user:', error);
-    }
-  };
-
-  const deleteUser = async (id) => {
-    try {
-      await axios.delete(`http://localhost:3000/users/${id}`);
-      fetchUsers(); // Refresh the user list
-    } catch (error) {
-      console.error('Error deleting user:', error);
-    }
-  };
-
+const App = () => {
   return (
-    <div>
-      <h1>User Management</h1>
-      <input
-        type="text"
-        placeholder="Name"
-        value={user.name}
-        onChange={(e) => setUser({ ...user, name: e.target.value })}
-      />
-      <input
-        type="email"
-        placeholder="Email"
-        value={user.email}
-        onChange={(e) => setUser({ ...user, email: e.target.value })}
-      />
-      <input
-        type="password"
-        placeholder="Password"
-        value={user.password}
-        onChange={(e) => setUser({ ...user, password: e.target.value })}
-      />
-      <button onClick={createUser}>Create User</button>
-
-      <h2>Users List</h2>
-      <ul>
-        {users.map((user) => (
-          <li key={user.id}>
-            {user.name} - {user.email}
-            <button onClick={() => deleteUser(user.id)}>Delete</button>
-          </li>
-        ))}
-      </ul>
-      <Properties />
-    </div>
+    <Router>
+      <Switch>
+        <Route path="/manager/add-property" component={AddProperty} />
+        <Route path="/manager/edit-property/:id" component={EditProperty} />
+        <Route path="/manager/delete-property/:id" component={DeleteProperty} />
+        <Route path="/manager/manage-inquiries" component={ManageInquiries} />
+        <Route path="/manager/profile" component={Profile} />
+        <Route path="/seeker/search-properties" component={SearchProperties} />
+        <Route path="/seeker/property-details/:id" component={PropertyDetails} />
+        <Route path="/seeker/favorites" component={Favorites} />
+        <Route path="/seeker/search-history" component={SearchHistory} />
+        <Route path="/seeker/make-inquiry/:id" component={MakeInquiry} />
+      </Switch>
+    </Router>
   );
-}
+};
 
 export default App;
