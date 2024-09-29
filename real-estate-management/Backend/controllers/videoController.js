@@ -24,9 +24,11 @@ const getVideosByPropertyId = (req, res) => {
 const deleteVideo = (req, res) => {
     const { id } = req.params;
     const query = 'DELETE FROM property_videos WHERE id = ?';
-    db.query(query, [id], (err) => {
+    db.query(query, [id], (err,result) => {
         if (err) return res.status(500).json({ error: 'Failed to delete video' });
-        res.json({ message: 'Video deleted successfully' });
+        const vidId = result.insertId || result.affectedRows > 0 ? result.insertId : null;
+
+        res.json({ message: 'Video deleted successfully',video_id:vidId });
     });
 };
 
