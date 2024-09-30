@@ -1,16 +1,37 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { deleteUser } from '../API/api'; // Import delete API
 import { useNavigate } from 'react-router-dom';
+import { jwtDecode } from "jwt-decode";
 
 const DeleteUser = () => {
   const [showModal, setShowModal] = useState(false);
   const [error, setError] = useState('');
+  const [userId, setUserId] = useState(null); // Store userId in state
+
   const navigate = useNavigate();
   const token = localStorage.getItem('token');
+  useEffect(() => {
+    if (!token) {
+      setError('No valid session found, please log in.');
+      navigate('/login');
+      return;
+    }
+
+    try {
+      const decoded = jwtDecode(token); // Decode the token
+      setUserId(decoded.id); // Set userId in state
+    } catch (decodeError) {
+      setError('Invalid token, please log in again.');
+      localStorage.removeItem('token');
+      navigate('/login');
+      return;
+    }
+  }, [token, navigate]); // This effect only sets userId from the token
+
 
   const handleDelete = async () => {
     try {
-      await deleteUser(token); // Call delete user API
+      await deleteUser(userId, token); // Call delete user API
       localStorage.removeItem('token'); // Clear the token after deleting account
       navigate('/register'); // Redirect to registration after deletion
     } catch (error) {
