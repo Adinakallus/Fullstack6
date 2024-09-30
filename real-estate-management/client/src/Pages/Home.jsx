@@ -14,10 +14,16 @@ function Home() {
     const handleRegisterClick=()=>{
         navigate('/register');
     }
+
+    const handleLoginClick=()=>{
+        navigate('/login');
+    }
     return(
         <div>
             <h2>Home</h2>
             <button onClick={handleRegisterClick}>Register</button>
+            <button onClick={handleLoginClick}>Login</button>
+
         </div>
     )
 }
