@@ -1,7 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { FaUserCircle } from 'react-icons/fa'; // Import the user icon
+import '../CSS/NavBar.css'; // Import the CSS file
+
 const NavigationBar = () => {
   const [userType, setUserType] = useState(null);
+  const [username, setUsername] = useState(null);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
   const token = localStorage.getItem('token');
   const navigate = useNavigate();
 
@@ -10,12 +15,12 @@ const NavigationBar = () => {
       async function fetchUserType() {
         try {
           const response = await getUser(token);
-          const role_id=response.role_id;
-          if(role_id==1){
-            setUserType('property_manager'); 
-          }
-          if(role_id==2){
-            setUserType('property_seeker'); 
+          const role_id = response.role_id;
+          setUsername(response.name); // Assuming the response has a name field
+          if (role_id === 1) {
+            setUserType('property_manager');
+          } else if (role_id === 2) {
+            setUserType('property_seeker');
           }
         } catch (error) {
           console.error('Error fetching user type:', error);
@@ -30,94 +35,47 @@ const NavigationBar = () => {
     navigate('/login');
   };
 
+  const toggleDropdown = () => {
+    setDropdownOpen(!dropdownOpen);
+  };
+
   return (
-    <nav style={styles.navbar}>
-      <div style={styles.navItem}>
-        <Link to="/" style={styles.link}>Home</Link>
+    <nav className="navbar">
+      <div className="left-container">
+        <h1 className="logo">HomeQuest</h1>
+        <Link to="/" className="home-link">Home</Link>
       </div>
-      <div style={styles.navLinks}>
-        {!token && (
-          <>
-            <div style={styles.navItem}>
-              <Link to="/register" style={styles.link}>Register</Link>
-            </div>
-            <div style={styles.navItem}>
-              <Link to="/login" style={styles.link}>Login</Link>
-            </div>
-          </>
+      <div className="nav-links">
+        {token && userType === 'property_manager' && (
+          <div className="nav-item">
+            <Link to="/add-property" className="link">Add Property</Link>
+          </div>
         )}
-        {token && (
-          <>
-            <div style={styles.navItem}>
-              <Link to="/profile" style={styles.link}>Profile</Link>
-            </div>
-            {userType === 'admin' && (
-              <div style={styles.navItem}>
-                <Link to="/admin-dashboard" style={styles.link}>Manage Shows</Link>
+        <div className="nav-item">
+          <div className="user-container" onClick={toggleDropdown}>
+            <FaUserCircle className="user-icon" />
+            {dropdownOpen && (
+              <div className="dropdown">
+                {!token ? (
+                  <>
+                    <Link to="/login" className="dropdown-link">Login</Link>
+                    <Link to="/register" className="dropdown-link">Register</Link>
+                  </>
+                ) : (
+                  <>
+                    <p className="dropdown-text">Welcome, {username}!</p>
+                    <Link to="/update-profile" className="dropdown-link">Update Profile</Link>
+                    <button onClick={handleLogout} className="dropdown-link">Logout</button>
+                    <button onClick={() => navigate('/delete-account')} className="dropdown-link">Delete Account</button>
+                  </>
+                )}
               </div>
             )}
-             {userType === 'show_admin' && (
-              <div style={styles.navItem}>
-                <Link to="/admin-dashboard" style={styles.link}>Manage Shows</Link>
-              </div>
-            )}
-            <div style={styles.navItem}>
-              <button onClick={handleLogout} style={styles.button}>Logout</button>
-            </div>
-          </>
-        )}
+          </div>
+        </div>
       </div>
     </nav>
   );
 };
-
-const styles = {
-    navbar: {
-      display: 'flex',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      padding: '1rem 2rem',
-      background: 'linear-gradient(90deg, #007acc 0%, #00c851 100%)', // שילוב של כחול וטורקיז
-      boxShadow: '0 4px 10px rgba(0, 0, 0, 0.3)',
-      position: 'sticky',
-      top: 0,
-      zIndex: 1000,
-    },
-    navItem: {
-      margin: '0 1rem',
-    },
-    navLinks: {
-      display: 'flex',
-      alignItems: 'center',
-    },
-    link: {
-      color: '#fff',
-      textDecoration: 'none',
-      fontSize: '18px',
-      padding: '0.5rem 1rem',
-      transition: 'background-color 0.3s ease, color 0.3s ease',
-      borderRadius: '5px',
-      margin: '0 0.5rem',
-      background: '#1e90ff', 
-    },
-    linkHover: {
-      backgroundColor: '#00bfa5', 
-    },
-    button: {
-      backgroundColor: '#ff5722', 
-      color: '#fff',
-      border: 'none',
-      padding: '0.5rem 1rem',
-      cursor: 'pointer',
-      borderRadius: '25px',
-      transition: 'background-color 0.3s ease',
-      margin: '0 0.5rem',
-    },
-    buttonHover: {
-      backgroundColor: '#e64a19',
-    },
-  };
-  
-  
 
 export default NavigationBar;
