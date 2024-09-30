@@ -1,16 +1,20 @@
 import React, { useState } from 'react';
 import { registerUser } from '../API/api'; // Adjust the path according to your project structure
+import '../CSS/RegistrationPage.css'; // Import the CSS file for styling
 
 const RegistrationPage = () => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     password: '',
+    confirmPassword: '',
     role_id: 2, // Default to seeker
   });
 
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
+  const [passwordError, setPasswordError] = useState('');
+  const [confirmPasswordError, setConfirmPasswordError] = useState('');
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -27,11 +31,32 @@ const RegistrationPage = () => {
     }));
   };
 
+  const validatePasswordStrength = (password) => {
+    const strongPasswordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    return strongPasswordRegex.test(password);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (formData.password !== formData.confirmPassword) {
+      setConfirmPasswordError('Passwords do not match');
+      return;
+    } else {
+      setConfirmPasswordError('');
+    }
+
+    if (!validatePasswordStrength(formData.password)) {
+      setPasswordError('Password must be at least 8 characters long, contain an uppercase letter, a number, and a special character.');
+      return;
+    } else {
+      setPasswordError('');
+    }
+
     try {
       const response = await registerUser(formData); // Call your API function
       setSuccessMessage('User registered successfully!');
+      setError('');
     } catch (error) {
       setError(error.message || 'Registration failed');
     }
@@ -40,42 +65,59 @@ const RegistrationPage = () => {
   return (
     <div className="registration-page">
       <h2>Register</h2>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-      {successMessage && <p style={{ color: 'green' }}>{successMessage}</p>}
-      <form onSubmit={handleSubmit}>
-        <div>
+      {error && <p className="error">{error}</p>}
+      {successMessage && <p className="success">{successMessage}</p>}
+      
+      <form onSubmit={handleSubmit} className="registration-form">
+        <div className="form-group">
           <label>Name:</label>
-          <input 
-            type="text" 
-            name="name" 
-            value={formData.name} 
-            onChange={handleInputChange} 
-            required 
+          <input
+            type="text"
+            name="name"
+            value={formData.name}
+            onChange={handleInputChange}
+            required
           />
         </div>
-        <div>
+        
+        <div className="form-group">
           <label>Email:</label>
-          <input 
-            type="email" 
-            name="email" 
-            value={formData.email} 
-            onChange={handleInputChange} 
-            required 
+          <input
+            type="email"
+            name="email"
+            value={formData.email}
+            onChange={handleInputChange}
+            required
           />
         </div>
-        <div>
+        
+        <div className="form-group">
           <label>Password:</label>
-          <input 
-            type="password" 
-            name="password" 
-            value={formData.password} 
-            onChange={handleInputChange} 
-            required 
+          <input
+            type="password"
+            name="password"
+            value={formData.password}
+            onChange={handleInputChange}
+            required
           />
+          {passwordError && <p className="error-message">{passwordError}</p>} {/* Password strength message */}
         </div>
-        <div>
+        
+        <div className="form-group">
+          <label>Confirm Password:</label>
+          <input
+            type="password"
+            name="confirmPassword"
+            value={formData.confirmPassword}
+            onChange={handleInputChange}
+            required
+          />
+          {confirmPasswordError && <p className="error-message">{confirmPasswordError}</p>} {/* Password mismatch message */}
+        </div>
+
+        <div className="form-group">
           <label>Role:</label>
-          <div>
+          <div className="role-toggle">
             <label>
               <input
                 type="radio"
@@ -96,7 +138,8 @@ const RegistrationPage = () => {
             </label>
           </div>
         </div>
-        <button type="submit">Register</button>
+        
+        <button type="submit" className="submit-btn">Register</button>
       </form>
     </div>
   );
