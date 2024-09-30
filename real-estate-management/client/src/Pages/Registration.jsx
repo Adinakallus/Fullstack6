@@ -22,6 +22,25 @@ const RegistrationPage = () => {
       ...formData,
       [name]: value,
     });
+
+    // Clear password error when user starts typing a valid password
+    if (name === 'password' && validatePasswordStrength(value)) {
+      setPasswordError('');
+    }
+
+    // Clear confirm password error when passwords match
+    if (name === 'confirmPassword' && value === formData.password) {
+      setConfirmPasswordError('');
+    }
+  };
+
+  // Validate confirm password on blur
+  const handleConfirmPasswordBlur = () => {
+    if (formData.password !== formData.confirmPassword) {
+      setConfirmPasswordError('Passwords do not match');
+    } else {
+      setConfirmPasswordError('');
+    }
   };
 
   const handleRoleToggle = () => {
@@ -36,27 +55,40 @@ const RegistrationPage = () => {
     return strongPasswordRegex.test(password);
   };
 
+  // Validate password strength on blur
+  const handlePasswordBlur = () => {
+    if (!validatePasswordStrength(formData.password)) {
+      setPasswordError('Password must be at least 8 characters long, contain an uppercase letter, a number, and a special character.');
+    } else {
+      setPasswordError('');
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (formData.password !== formData.confirmPassword) {
       setConfirmPasswordError('Passwords do not match');
       return;
-    } else {
-      setConfirmPasswordError('');
     }
 
     if (!validatePasswordStrength(formData.password)) {
       setPasswordError('Password must be at least 8 characters long, contain an uppercase letter, a number, and a special character.');
       return;
-    } else {
-      setPasswordError('');
     }
 
     try {
       const response = await registerUser(formData); // Call your API function
       setSuccessMessage('User registered successfully!');
       setError('');
+
+      setFormData({
+        name: '',
+        email: '',
+        password: '',
+        confirmPassword: '',
+        role_id: 2, // Reset role to seeker
+      });
     } catch (error) {
       setError(error.message || 'Registration failed');
     }
@@ -98,9 +130,10 @@ const RegistrationPage = () => {
             name="password"
             value={formData.password}
             onChange={handleInputChange}
+            onBlur={handlePasswordBlur} 
             required
           />
-          {passwordError && <p className="error-message">{passwordError}</p>} {/* Password strength message */}
+          {passwordError && <p className="error-message">{passwordError}</p>}
         </div>
         
         <div className="form-group">
@@ -110,9 +143,10 @@ const RegistrationPage = () => {
             name="confirmPassword"
             value={formData.confirmPassword}
             onChange={handleInputChange}
+            onBlur={handleConfirmPasswordBlur} 
             required
           />
-          {confirmPasswordError && <p className="error-message">{confirmPasswordError}</p>} {/* Password mismatch message */}
+          {confirmPasswordError && <p className="error-message">{confirmPasswordError}</p>}
         </div>
 
         <div className="form-group">

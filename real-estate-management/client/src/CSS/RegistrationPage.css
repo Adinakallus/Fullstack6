@@ -1,12 +1,21 @@
 /* Centering the form */
-.registration-page {
-    max-width: 400px;
-    margin: 0 auto;
+html, body {
+    height: 100%;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .registration-page {
+    max-width: 800px; /* Increase the width to make the form wider */
+    width: 100%;
+    min-width: 600px;  /* Set a minimum width to prevent it from being too narrow */
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     background-color: #f9f9f9;
-    text-align: center;
+    text-align: left;
   }
   
   /* Styling for form elements */
@@ -27,6 +36,12 @@
     font-size: 16px;
   }
   
+  label {
+    display: block;
+    margin-bottom: 5px;
+    text-align: left;
+  }
+  
   /* Styling for role toggle */
   .role-toggle {
     display: flex;
@@ -39,7 +54,9 @@
     color: red;
     font-size: 12px;
     margin-top: 5px;
-    text-align: left;
+    word-wrap: break-word;  /* Break long messages onto a new line */
+    white-space: normal;    /* Ensure the text wraps properly */
+    width: 100%;            /* Ensure the message takes full width available */
   }
   
   .success {
