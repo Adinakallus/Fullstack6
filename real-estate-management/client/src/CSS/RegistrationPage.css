@@ -1,0 +1,85 @@
+/* Centering the form */
+html, body {
+    height: 100%;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .registration-page {
+    max-width: 800px; /* Increase the width to make the form wider */
+    width: 100%;
+    min-width: 600px;  /* Set a minimum width to prevent it from being too narrow */
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    background-color: #f9f9f9;
+    text-align: left;
+  }
+  
+  /* Styling for form elements */
+  .registration-form {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .form-group {
+    margin-bottom: 15px;
+  }
+  
+  input {
+    width: 100%;
+    padding: 10px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    font-size: 16px;
+  }
+  
+  label {
+    display: block;
+    margin-bottom: 5px;
+    text-align: left;
+  }
+  
+  /* Styling for role toggle */
+  .role-toggle {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 10px;
+  }
+  
+  /* Styling for error and success messages */
+  .error-message {
+    color: red;
+    font-size: 12px;
+    margin-top: 5px;
+    word-wrap: break-word;  /* Break long messages onto a new line */
+    white-space: normal;    /* Ensure the text wraps properly */
+    width: 100%;            /* Ensure the message takes full width available */
+  }
+  
+  .success {
+    color: green;
+  }
+  
+  .error {
+    color: red;
+  }
+  
+  /* Styling for the submit button */
+  .submit-btn {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    margin-top: 15px;
+  }
+  
+  .submit-btn:hover {
+    background-color: #0056b3;
+  }
+  

@@ -10,11 +10,19 @@ import PropertyDetails from './Components/PropertySeeker/PropertyDetails';
 import Favorites from './Components/PropertySeeker/Favorites';
 import SearchHistory from './Components/PropertySeeker/SearchHistory';
 import MakeInquiry from './Components/PropertySeeker/MakeInquiry';
+import NavigationBar from './Components/NavBar';
+import Footer from './Components/Footer';
+import RegistrationPage from './Pages/Registration';  
+import LoginPage from './Pages/Login';
+import Home from './Pages/Home';
 
 const App = () => {
   return (
     <Router>
       <Switch>
+      <Route path="/" element={<Home />} />
+        <Route path="/register" element={<RegistrationPage />} />
+        <Route path="/login" element={<LoginPage />} />
         <Route path="/manager/add-property" component={AddProperty} />
         <Route path="/manager/edit-property/:id" component={EditProperty} />
         <Route path="/manager/delete-property/:id" component={DeleteProperty} />
