@@ -8,6 +8,8 @@ async function apiRequest(endpoint, method = 'GET', data = null, token = null) {
     if (token) {
         headers['Authorization'] = `Bearer ${token}`;
     }
+    console.log("apiRequest");
+    
 
     const config = {
         method,

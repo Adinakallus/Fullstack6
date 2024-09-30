@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { registerUser } from '../API/api'; // Adjust the path according to your project structure
 import '../CSS/RegistrationPage.css'; // Import the CSS file for styling
 
@@ -15,6 +16,7 @@ const RegistrationPage = () => {
   const [successMessage, setSuccessMessage] = useState('');
   const [passwordError, setPasswordError] = useState('');
   const [confirmPasswordError, setConfirmPasswordError] = useState('');
+  const navigate = useNavigate();
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -89,6 +91,7 @@ const RegistrationPage = () => {
         confirmPassword: '',
         role_id: 2, // Reset role to seeker
       });
+      navigate('/login');
     } catch (error) {
       setError(error.message || 'Registration failed');
     }
