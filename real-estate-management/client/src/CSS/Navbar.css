@@ -1,94 +1,84 @@
 /* Navbar styles */
 .navbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1rem 2rem;
-    background: linear-gradient(90deg, #007acc 0%, #00c851 100%);
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-  }
-  
-  .left-container {
-    display: flex;
-    align-items: center;
-  }
-  
-  .logo {
-    font-size: 2rem;
-    color: #fff;
-    margin-right: 2rem;
-  }
-  
-  .home-link {
-    color: #fff;
-    text-decoration: none;
-    font-size: 18px;
-    padding: 0.5rem 1rem;
-    background: #1e90ff;
-    border-radius: 5px;
-  }
-  
-  .nav-links {
-    display: flex;
-    align-items: center;
-  }
-  
-  .nav-item {
-    margin: 0 1rem;
-  }
-  
-  .link {
-    color: #fff;
-    text-decoration: none;
-    font-size: 18px;
-    padding: 0.5rem 1rem;
-    border-radius: 5px;
-    background: #1e90ff;
-    margin: 0 0.5rem;
-  }
-  
-  .user-container {
-    position: relative;
-    cursor: pointer;
-  }
-  
-  .user-icon {
-    font-size: 30px;
-    color: #fff;
-  }
-  
-  .dropdown {
-    position: absolute;
-    right: 0;
-    top: 40px;
-    background-color: #fff;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    border-radius: 8px;
-    overflow: hidden;
-    z-index: 1001;
-  }
-  
-  .dropdown-link {
-    display: block;
-    padding: 10px 20px;
-    text-decoration: none;
-    color: #333;
-    font-size: 16px;
-    transition: background-color 0.3s;
-    text-align: center;
-  }
-  
-  .dropdown-text {
-    padding: 10px 20px;
-    font-size: 16px;
-    color: #333;
-    text-align: center;
-  }
-  
-  .dropdown-link:hover {
-    background-color: #f5f5f5;
-  }
-  
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  background:#0a73ac;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  width: 100vw; /* Ensure navbar spans full width */
+  height: 8vw;
+  box-sizing: border-box; /* Include padding in width calculation */
+}
+
+/* Additional necessary styles for the rest of the page */
+body {
+  margin: 0;
+  padding: 0;
+}
+
+.main-content {
+  padding-top: 80px; /* Add padding to avoid content being hidden under the navbar */
+}
+
+/* Left container and logo styling */
+.left-container {
+  display: flex;
+  align-items: center;
+}
+
+.logo {
+  font-size: 2rem;
+  color: #fff;
+  margin-right: 2rem;
+}
+
+/* Navbar links and dropdown */
+.home-link, .link {
+  color: #fff;
+  text-decoration: none;
+  font-size: 18px;
+  padding: 0.5rem 1rem;
+  background: #1e90ff;
+  border-radius: 5px;
+  margin: 0 0.5rem;
+}
+
+.user-container {
+  position: relative;
+  cursor: pointer;
+}
+
+.user-icon {
+  font-size: 30px;
+  color: #fff;
+}
+
+/* Dropdown styling */
+.dropdown {
+  position: absolute;
+  right: 0;
+  top: 40px;
+  background-color: #fff;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  overflow: hidden;
+  z-index: 1001;
+}
+
+.dropdown-link {
+  display: block;
+  padding: 10px 20px;
+  text-decoration: none;
+  color: #333;
+  font-size: 16px;
+  transition: background-color 0.3s;
+  text-align: center;
+}
+
+.dropdown-link:hover {
+  background-color: #f5f5f5;
+}

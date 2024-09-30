@@ -17,6 +17,7 @@ import UpdateUser from './Pages/UpdateUser';
 import DeleteUser from './Pages/DeleteUSer';
 import LoginPage from './Pages/Login';
 import Home from './Pages/Home';
+//import './App.css'
 
 const App = () => {
   return (
