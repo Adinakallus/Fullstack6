@@ -29,7 +29,7 @@ const App = () => {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/update-profile" element={<UpdateUser />} />
         <Route path="/delete-account" element={<DeleteUser />} />
-        <Route path="/manager/add-property" component={AddProperty} />
+        <Route path="/manager/add-property" element={<AddProperty/>} />
         <Route path="/manager/edit-property/:id" component={EditProperty} />
         <Route path="/manager/manage-inquiries" component={ManageInquiries} />
         <Route path="/manager/profile" component={Profile} />

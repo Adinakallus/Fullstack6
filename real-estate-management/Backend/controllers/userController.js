@@ -27,11 +27,15 @@ const getAllUsers = (req, res) => {
 // Get user by ID
 const getUserById = (req, res) => {    
     const { id } = req.params;
-    console.log("getUserbyid, id:", id);
+    console.log("getUserbyid, :", id);
 
     db.query('SELECT id, name, email, role_id FROM users WHERE id = ?', [id], (err, results) => {
+        console.log(results[0])
+
         if (err) return res.status(500).json({ error: err.message });
-        if (results.length === 0) return res.status(404).json({ message: 'User not found' });
+        if (results.length === 0) {
+            return res.status(404).json({ message: 'User not found' });
+        }
         res.json(results[0]);
     });
 };

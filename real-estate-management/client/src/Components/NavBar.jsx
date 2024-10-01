@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { FaUserCircle } from 'react-icons/fa'; // Import the user icon
-import '../CSS/NavBar.css'; // Import the CSS file
+import { getUserById } from '../API/api'; // Keeping this function unchanged as per your setup
+import {jwtDecode} from "jwt-decode"; // This is your preferred way of importing
+import '../CSS/Navbar.css'; // Importing CSS for styling
 
 const NavigationBar = () => {
   const [userType, setUserType] = useState(null);
-  const [username, setUsername] = useState(null);
-  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [userName, setUserName] = useState(''); 
   const token = localStorage.getItem('token');
   const navigate = useNavigate();
 
@@ -14,14 +14,10 @@ const NavigationBar = () => {
     if (token) {
       async function fetchUserType() {
         try {
-          const response = await getUser(token);
-          const role_id = response.role_id;
-          setUsername(response.name); // Assuming the response has a name field
-          if (role_id === 1) {
-            setUserType('property_manager');
-          } else if (role_id === 2) {
-            setUserType('property_seeker');
-          }
+          const decoded = jwtDecode(token); // Decoding the token correctly without changing it
+          const response = await getUserById(decoded.id, token); // Assuming userId comes from token
+          setUserType(response.role_id === 1 ? 'property_manager' : 'property_seeker');
+          setUserName(response.name);
         } catch (error) {
           console.error('Error fetching user type:', error);
         }
@@ -35,44 +31,34 @@ const NavigationBar = () => {
     navigate('/login');
   };
 
-  const toggleDropdown = () => {
-    setDropdownOpen(!dropdownOpen);
-  };
-
   return (
     <nav className="navbar">
       <div className="left-container">
-        <h1 className="logo">HomeQuest</h1>
+        <div className="logo">HomeQuest</div>
         <Link to="/" className="home-link">Home</Link>
-      </div>
-      <div className="nav-links">
-        {token && userType === 'property_manager' && (
-          <div className="nav-item">
-            <Link to="/add-property" className="link">Add Property</Link>
-          </div>
+        {userType === 'property_manager' && (
+          <Link to="/manager/add-property" className="home-link add-property-btn">Add Property</Link> /* AddProperty button */
         )}
-        <div className="nav-item">
-          <div className="user-container" onClick={toggleDropdown}>
-            <FaUserCircle className="user-icon" />
-            {dropdownOpen && (
+      </div>
+      <div className="right-container">
+        {!token ? (
+          <>
+            <Link to="/register" className="link">Register</Link>
+            <Link to="/login" className="link">Login</Link>
+          </>
+        ) : (
+          <>
+            <div className="user-container">
+              <span className="user-icon">👤</span>
               <div className="dropdown">
-                {!token ? (
-                  <>
-                    <Link to="/login" className="dropdown-link">Login</Link>
-                    <Link to="/register" className="dropdown-link">Register</Link>
-                  </>
-                ) : (
-                  <>
-                    <p className="dropdown-text">Welcome, {username}!</p>
-                    <Link to="/update-profile" className="dropdown-link">Update Profile</Link>
-                    <button onClick={handleLogout} className="dropdown-link">Logout</button>
-                    <button onClick={() => navigate('/delete-account')} className="dropdown-link">Delete Account</button>
-                  </>
-                )}
+              <span className="welcome-message">Welcome, {userName}!</span> {/* Welcome message added */}
+                <Link to="/update-profile" className="dropdown-link">Update User</Link>
+                <Link to="/delete-account" className="dropdown-link">Delete Account</Link>
+                <button onClick={handleLogout} className="dropdown-link">Logout</button>
               </div>
-            )}
-          </div>
-        </div>
+            </div>
+          </>
+        )}
       </div>
     </nav>
   );

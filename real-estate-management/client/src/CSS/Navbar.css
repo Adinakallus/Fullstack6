@@ -31,7 +31,9 @@ body {
 }
 
 .logo {
-  font-size: 2rem;
+  font-size: 4rem;
+  font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+  font-weight: 800;
   color: #fff;
   margin-right: 2rem;
 }
@@ -51,12 +53,13 @@ body {
   position: relative;
   cursor: pointer;
 }
-
 .user-icon {
   font-size: 30px;
   color: #fff;
 }
-
+.fa fa-user user-icon{
+  color:#fff;
+}
 /* Dropdown styling */
 .dropdown {
   position: absolute;
