@@ -43,6 +43,8 @@ const authenticateToken = (req, res, next) => {
 // };
 const authorizeRole = (...allowedRoles) => {
     return (req, res, next) => {
+        console.log("authorizeRole");
+        
         try {
             console.log("id:", req.user.id);
             // Check if user is authenticated

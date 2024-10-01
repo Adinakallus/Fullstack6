@@ -8,7 +8,6 @@ async function apiRequest(endpoint, method = 'GET', data = null, token = null) {
     if (token) {
         headers['Authorization'] = `Bearer ${token}`;
     }
-    console.log("apiRequest");
     
 
     const config = {
@@ -61,6 +60,8 @@ export async function getPropertyById(id) {
 }
 
 export async function createProperty(propertyData, token) {
+    console.log("api/createProperty");
+    
     return await apiRequest('/properties/create', 'POST', propertyData, token);
 }
 

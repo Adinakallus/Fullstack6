@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
-import propertyService from '../../Services/propertyService';
+import React, { useState, useEffect } from 'react';
+import { getUserById ,createProperty } from '../../API/api' // Keeping this function unchanged as per your setup
+import { Link, useNavigate } from 'react-router-dom';
+import {jwtDecode} from "jwt-decode"; // This is your preferred way of importing
 
 const AddProperty = () => {
   const [property, setProperty] = useState({
@@ -12,6 +14,27 @@ const AddProperty = () => {
     images: [],
     videos: [],
   });
+  const [managerId, setManagerId]=useState(null);
+
+  const token = localStorage.getItem('token');
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (token) {
+      async function fetchUserType() {
+        try {
+          const decoded = jwtDecode(token); // Decoding the token correctly without changing it
+          const response = await getUserById(decoded.id, token); // Assuming userId comes from token
+          setProperty({...property, [managerId]: response.id});
+          console.log("property:", property);
+          
+        } catch (error) {
+          console.error('Error fetching user type:', error);
+        }
+      }
+      fetchUserType();
+    }
+  }, [token]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -20,7 +43,7 @@ const AddProperty = () => {
 
   const handleSubmit = async () => {
     try {
-      await propertyService.addProperty(property);
+      await createProperty(property, token);
       alert('Property added successfully');
     } catch (error) {
       alert('Error adding property');
